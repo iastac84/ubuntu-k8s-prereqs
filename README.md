@@ -1,195 +1,69 @@
-# ansible-rpi 0.8.0
+# ubuntu-k8s-prereqs
 
 ## Purpose
 
-Make Raspberry Pi up and running in a few command.
+Quickly setup Ubuntu servers for Kubernetes 
 
-Tested on a Rpi 3 B+ and a Rpi 1 B.
+Playbook based on steps from A Cloud Guru : https://acloudguru-content-attachment-production.s3-accelerate.amazonaws.com/1658326656460-Building%20a%20Kubernetes%20Cluster.pdf 
+
+First ssh via public IPs, set passwords, set hostnames (sudo hostnamectl set-hostname <hostname>), copy ssh keys. 
+Note, if Ubuntu was installed from scratch, ensure SSH is enabled and not firewalled. 
 
 ## Roles
+- k8s-prereqs
+- k8s-prereqs-ec2
+- k8s-prereqs-pi
 
-### `common` role
+### `k8s-prereqs` role 
 
-> Setup the Rpi with with updates and better security
+> Setup the Ubuntu servers
 
-- Locale setup
-- System upgrade (*including kernel*)
-- Adding some useful packages (*curl, vim, tmux, git…*)
-- UFW firewall rules allowing user-specified ports and protocols
-- Logwatch for system status emails (*via SSMTP*)
-- SSH with key-only authentification
-- Custom sudo user for rpi (*thus disabling pi as Rpi sudoer*)
-- `oh-my-zsh` install and vim as default editor
-- Dynamic network folder and local drive setup (*Works with SAMBA and include basic credentials management*)
-- Fail2Ban configuration to send mail via SSMTP, handle a custom SSH port and
-  some user-defined services
-- Optional hostname update and Zeroconf
-- Optional custom SSH banner
-- Optional Wifi config
-- Optional Mosh support
-- Optional unsudo of the pi user
-- Optionally add a list of user to the sudoers with NOPASSWD
+- Load kernel modules
+- Modify system settings
+- Install and configure containerd
+- Disable swap 
+- Install kubeadm, kubelet, and kubectl
 
-### `download_server` role
+### `k8s-prereqs-ec2` role
 
-> Turn the Rpi in a download server for ddl and torrents
+> Test / Placeholder for EC2 specfic requirements 
 
-- Aria2 daemon
-- RPC interface for remote monitoring with optional SSL encryption
-- Shared downloads directory (*may be replaced by a previously configured network folder*)
+- Create test file 
 
-### `media_center` role
+### `k8s-prereqs-pi` role
 
-> Turn your Raspberry into a decent customizable media center
+> Specific Raspberry Pi requirements
 
-- Kodi basic installation with separate user
-- Dynamic sources creation (*may be linked to previously configured network folders*)
-- Buffer handling optimized for a Raspberry
-- Optional `kodi` user with `kodi-standalone` and a minimal Openbox setup
-- Optional [Tvheadend](https://tvheadend.org/) install with basic config
-
-### `rpi_docker` role
-
-> Setup and enable control of a distant Raspberry Pi Docker host via Ansible
-
-- [HypriotOS](https://blog.hypriot.com/) oriented setup
-- Docker containers and deamon are behind the firewall by default (*see Docker Support for more infos*)
-- Ansible tools are setup (*allowing you to use docker_container, docker_image Ansible modules…*)
-
-### `unbound` role
-
-> Transform your Raspberry Pi into a DNS Server
-
-- Unbound setup & configuration
-- Add DNS entries
-- Generation of DNS entries from ansible inventory (A entries and reverse)
-- Forward to another DNS
-- IPv4 only for reverse
-
-*Note: Source code is in a [separate role](https://github.com/davidderus/ansible-role-unbound).*
-
-### `audio_center` role
-
-> Turns your Raspberry into a Spotify player
-
-**This role requires a PREMIUM Spotify account**
-
-- Setup an headless Spotify Connect client ([librespot](https://github.com/plietar/librespot))
-- Update audio config
+- As Raspberry Pi does not use GRUB, allow systemd to act as the cgroups manager
+- Updating /boot/firmware/cmdline.txt 
 
 ## Setup
+First ssh via public IPs, set passwords, set hostnames (sudo hostnamectl set-hostname <hostname>), copy ssh keys 
 
 ### With examples
 
-```
-# First
-cp hosts.inc /etc/ansible/hosts
-
-# Then
-cp playbook.yml.inc playbook.yml
-cp variables.yml.inc /etc/ansible/host_vars/my-host.yml
-```
+Update hardcodes values, including IP addresses and hostnames in:
+- k8s-inv
+- roles/k8s-prereqs/files/hosts 
 
 ### Usage
 
-First update the `hosts` file to target your Rpis.
-
-I recommend using an up-to-date [Raspbian Lite image](https://downloads.raspberrypi.org/raspbian_lite_latest).
-
-Make sure that the Rpi is SSHable (**latest raspbian lite images come with SSH
-disabled by default, creating a file with name "ssh" in boot partition is
-required to enable it.**).
-
-Then the first time run:
+First update the `hosts` file to target your servers, and then test ansible: 
 
 ```shell
-ansible-playbook playbook.yml -u pi --ask-pass
+ansible all -i k8s-inv -m ping
+ansible all -i k8s-inv -m setup 
+ansible all -i k8s-inv -m setup  -a "filter=ansible_os_family"
 ```
 
-**You can also store user name in inventory file and user's pass in your Ansible
-vault.**
-
-### Dev with Vagrant
-
-First run:
+Run the playbook with: 
 
 ```shell
-ansible-playbook playbook.yml -i hosts.dev
+ansible-playbook -i k8s-inv k8s-prereqs.yaml  -b --ask-become-pass
 ```
-
-Next runs:
-
-```shell
-# Editing the hosts file may be required to update the SSH port
-# A vagrant reload may also be needed
-# Checks access with
-ansible all -m ping -u neo
-
-# Execute updated playbook
-ansible-playbook playbook.yml -u neo --ask-become-pass
-```
-
-**You can also store user name in inventory file and user's pass in your Ansible
-vault.**
-
-## User password generation
-
-`password_hash` is a useful Jinja filter but uses 656000 rounds for SHA512 hashing.
-
-The default is 5000 in glibc [1], and it adds an important computing cost on a Rpi.
-
-This may cause axtra slowness on user authentification (*ie. sudo password prompt*)
-
-Please use the following command to generate a user password hash [2]:
-
-```shell
-python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt(getpass.getpass(), rounds=5000)"
-```
-
-[1](https://github.com/ansible/ansible/issues/15326)
-[2](https://docs.ansible.com/ansible/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module)
-
-## Docker Support
-
-In order to ease Docker handling on Rpi, I recommend the
-[HypriotOS image](http://blog.hypriot.com/downloads/).
-
-### Current state
-
-The `rpi_docker` role is tested with it, but may work with other setups.
-
-Modify the following vars in order to adapt to your device:
-
-```yml
-rd_limit_nofile: 1048576
-rd_limit_nproc: 1048576
-rd_limit_core: infinity
-```
-
-### Security
-
-The `common` role will secure the HypriotOS Rpi in a way that by default:
-
-- `docker-machine create` will **fail**
-  (_default user must have a NOPASSD sudo, see [](https://docs.docker.com/machine/drivers/generic/#/sudo-privileges)_)
-- Docker daemon tcp port (_2376_) will be unreachable (_however you can enable it manually in allowed_ports var_) but is started by default
-- Docker unix socket is accessible
-
-You may want to look to [this](https://github.com/DieterReuter/arm-docker-fixes/tree/master/001-fix-docker-machine-1.8.0-create-for-arm)
-for a manual `docker-machine` setup.
-
-Docker-machine and Raspbian Docker support may come in a future release.
-
-### Defaults
-
-- `storage_driver` is `overlay`
-- The `tlsverify` flag is enabled, and `tlscacert`, `tlscert`, `tlskey`
-- `LimitNOFILE` and `LimitNPROC` are set, but `LimitCORE` is not
-- iptables addition by Docker are deactivated
 
 ## TODO
 
-- [] Sudoers file rewrite
-- [] Segmentation into roles
-- [] Contribution guidelines
-- [] …
+- [] Tidy Up
+- [] Update for rpm based distros 
+
