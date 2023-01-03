@@ -38,7 +38,7 @@ Note, if Ubuntu was installed from scratch, ensure SSH is enabled and not firewa
 - Updating /boot/firmware/cmdline.txt 
 
 ## Setup
-First ssh via public IPs, set passwords, set hostnames (sudo hostnamectl set-hostname <hostname>), copy ssh keys 
+As above, first ssh via public IPs, set passwords, set hostnames (sudo hostnamectl set-hostname <hostname>), copy ssh keys 
 
 ### With examples
 
