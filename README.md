@@ -70,7 +70,8 @@ ansible-playbook -i k8s-inv k8s-prereqs.yaml  -b --ask-become-pass
 
 ## Next Steps 
 
-- [] Create the Kubernetes cluster with ```kubeadm init```
+Create the Kubernetes cluster with ```kubeadm init```
+
 Example: 
 On the control plane node: 
 ```
