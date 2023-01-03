@@ -1,0 +1,128 @@
+---
+
+  - name: create based on variable group
+    group: 
+      name: "{{ groupname }}"
+      state: present
+
+  - name: Update cloud.cfg for /etc/hosts persistence 
+    replace:
+      dest: /etc/cloud/cloud.cfg
+      regexp: ' - update_etc_hosts'
+      replace: '# - update_etc_hosts'
+    tags: [hosts]
+
+  - name: Update /etc/hosts
+    copy:
+      src: roles/k8s-prereqs/files/hosts
+      dest: /etc/hosts
+      mode: '0644'
+    tags: [hosts]
+
+  - name: Create a empty file for containerd config
+    copy:
+      content: ""
+      dest: /etc/modules-load.d/containerd.conf
+      force: no
+    tags: [contd_params]
+
+  - name: Configure sysctl params for Kubernetes
+    lineinfile: 
+      dest: /etc/modules-load.d/containerd.conf
+      line: '{{ item }}'
+    with_items:
+      - overlay
+      - br_netfilter
+    tags: [contd_params]
+
+  - name:  modprobe overlay
+    command:  modprobe overlay
+    tags: [modprobe]
+
+  - name:  modprobe br_netfilter
+    command:  modprobe br_netfilter
+    tags: [modprobe]
+
+  - name: Create a empty file for kubernetes sysctl params.
+    copy:
+      content: ""
+      dest: /etc/sysctl.d/99-kubernetes-cri.conf
+      force: no
+    tags: [sysctl_params]
+
+  - name: Configure sysctl params for Kubernetes
+    lineinfile: 
+      dest: /etc/sysctl.d/99-kubernetes-cri.conf
+      line: '{{ item }}'
+    with_items:
+      - 'net.bridge.bridge-nf-call-iptables = 1'
+      - 'net.ipv4.ip_forward = 1'
+      - 'net.bridge.bridge-nf-call-ip6tables = 1'
+    tags: [sysctl_params]
+
+  - name: Apply sysctl params without reboot.
+    command: sysctl --system
+    tags: [sysctl_params_apply]
+
+  - name: Create containerd directory if it does not exist
+    ansible.builtin.file:
+      path: /etc/containerd
+      state: directory
+      mode: '0755'
+    tags: [contd_dir]
+
+  - name: Update apt repo and cache on all Debian/Ubuntu boxes
+    apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    tags: [installs]
+
+  - name: Install packages
+    apt:
+      name:
+        - git
+        - vim
+        - cowsay
+        - apt-transport-https
+        - lvm2
+        - ca-certificates
+        - containerd
+      state: present
+    tags: [installs]
+
+  - name: containerd config default
+    shell: sudo containerd config default | sudo tee /etc/containerd/config.toml
+    tags: [containerd_toml]
+
+  - name: restart containerd service 
+    systemd:
+      name: containerd
+      state: restarted 
+      enabled: yes
+      daemon_reload: yes
+    tags: [containerd_restart]
+
+  - name: Add Google official GPG key
+    apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
+    tags: [google_gpg_key]
+
+  - name: Add Kubernetes Repository
+    apt_repository:
+      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main 
+      state: present
+      filename: kubernetes
+      mode: 0600
+    tags: [k8s_repo]
+
+  - name: Update apt repo and cache on all Debian/Ubuntu boxes
+    apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    tags: [aptcache]
+
+  - name: Installing Kubernetes Cluster Packages.
+    apt: 
+      name:
+        - "kubeadm={{ k8sversion }}"
+        - "kubectl={{ k8sversion }}"
+        - "kubelet={{ k8sversion }}"
+      state: present
+    tags: [install_k8s_binaries]

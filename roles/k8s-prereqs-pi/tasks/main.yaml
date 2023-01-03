@@ -1,0 +1,33 @@
+---
+  - name: Create tmp file
+    copy:
+      content: ""
+      dest: /tmp/pi-testfile
+      force: no
+    tags: [pi-test]
+
+  - name: Add sample text
+    lineinfile: 
+      dest: /tmp/pi-testfile
+      line: '{{ item }}'
+    with_items:
+      - '1'
+      - '2'
+      - '3'
+    tags: [pi-test]
+
+  - name: echo date to tmp file
+    shell: date >> /tmp/pi-testfile
+    tags: [pi-test]
+
+  - name: Test cmdline for cgroup_enable
+    shell: grep -c "cgroup_enable" /boot/firmware/cmdline.txt || true
+    register: test_grep
+    tags: [cgroups]
+
+  - name: add cgroup_enable to cmdline 
+    shell: sed -i.bak '/root/ s/$/ cgroup_enable=memory swapaccount=1/' /boot/firmware/cmdline.txt
+    args:
+      warn: false
+    when: test_grep.stdout == "0"
+    tags: [cgroups]

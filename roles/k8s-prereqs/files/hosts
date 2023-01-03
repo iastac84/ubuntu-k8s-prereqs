@@ -1,0 +1,5 @@
+127.0.0.1 localhost
+# Cloud Server Hostname mapping
+172.31.113.10   bc0802a6021c.mylabserver.com  isacg-kube01
+172.31.117.167   bc0802a6022c.mylabserver.com isacg-kube02
+172.31.118.228   bc0802a6023c.mylabserver.com isacg-kube03

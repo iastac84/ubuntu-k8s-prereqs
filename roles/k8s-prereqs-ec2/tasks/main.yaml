@@ -1,0 +1,21 @@
+---
+  - name: Create tmp file
+    copy:
+      content: ""
+      dest: /tmp/ec2-testfile
+      force: no
+    tags: [ec2-test]
+
+  - name: Add sample text
+    lineinfile: 
+      dest: /tmp/ec2-testfile
+      line: '{{ item }}'
+    with_items:
+      - '1'
+      - '2'
+      - '3'
+    tags: [ec2-test]
+
+  - name: echo date to tmp file
+    shell: date >> /tmp/ec2-testfile
+    tags: [ec2-test]
