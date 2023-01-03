@@ -4,7 +4,7 @@
 
 Quickly setup Ubuntu servers for Kubernetes 
 
-Playbook based on steps from A Cloud Guru : https://acloudguru-content-attachment-production.s3-accelerate.amazonaws.com/1658326656460-Building%20a%20Kubernetes%20Cluster.pdf 
+Playbook based on steps from A Cloud Guru : https://acloudguru-content-attachment-production.s3-accelerate.amazonaws.com/1658326656460-Building%20a%20Kubernetes%20Cluster.pdf with one control plane node and two workers. 
 
 First ssh via public IPs, set passwords, set hostnames (sudo hostnamectl set-hostname <hostname>), copy ssh keys. 
 Note, if Ubuntu was installed from scratch, ensure SSH is enabled and not firewalled. 
@@ -67,3 +67,41 @@ ansible-playbook -i k8s-inv k8s-prereqs.yaml  -b --ask-become-pass
 - [] Tidy Up
 - [] Update for rpm based distros 
 
+
+## Next Steps 
+
+- [] Create the Kubernetes cluster with ```kubeadm init``
+Example: 
+On the control plane node: 
+```
+sudo kubeadm init --pod-network-cidr 192.168.0.0/16 --kubernetes-version 1.24.0
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+Verify with: 
+```
+kubectl get nodes
+```
+
+Install the Calico network add-on
+```
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+```
+
+Get the join command:
+```
+kubeadm token create --print-join-command
+```
+
+Copy the join command from the control plane node. Run it on each worker node as root 
+```
+sudo kubeadm join ...
+```
+
+On the control plane node, verify all nodes in your cluster are ready. Note that it may take a few moments for all of the nodes to
+enter the READY state.
+```
+kubectl get nodes
+```
