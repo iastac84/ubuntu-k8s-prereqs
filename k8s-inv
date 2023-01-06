@@ -1,5 +1,5 @@
 [master]
-isacg-kube01 ansible_host=35.177.252.218 ansible_user=cloud_user
+isacg-kube01 ansible_user=cloud_user ansible_host=18.130.70.172
 [workers]
-isacg-kube02 ansible_host=18.135.97.51   ansible_user=cloud_user
-isacg-kube03 ansible_host=18.170.62.151 ansible_user=cloud_user
+isacg-kube02 ansible_user=cloud_user ansible_host=3.8.211.65
+isacg-kube03 ansible_user=cloud_user ansible_host=18.133.180.202
