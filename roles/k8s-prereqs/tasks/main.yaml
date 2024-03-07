@@ -102,7 +102,7 @@
 
   - name: Add Google official GPG key
     apt_key:
-      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      url: "{{ k8sversionkeyurl }}"
       state: present
     tags: [google_gpg_key]
 
