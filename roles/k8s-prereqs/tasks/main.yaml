@@ -125,8 +125,8 @@
   - name: Installing Kubernetes Cluster Packages.
     apt: 
       name:
-        - "kubeadm={{ k8sversion }}"
-        - "kubectl={{ k8sversion }}"
-        - "kubelet={{ k8sversion }}"
+        - kubeadm
+        - kubectl
+        - kubelet
       state: present
     tags: [install_k8s_binaries]
