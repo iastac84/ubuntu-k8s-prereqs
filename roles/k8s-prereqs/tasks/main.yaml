@@ -100,23 +100,20 @@
       daemon_reload: yes
     tags: [containerd_restart]
 
-  - name: Add Google official GPG key
-    apt_key:
-      url: "{{ k8sversionkeyurl }}"
-      state: present
-    tags: [google_gpg_key]
+    - name: Add Kubernetes apt-key
+      get_url:
+        url: https://pkgs.k8s.io/core:/stable:/v1.26/deb/Release.key
+        dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
+        mode: '0644'
+        force: true
+    tags: [k8s_apt_key]
 
-  - name: Add Kubernetes Repository
-    apt_repository:
-      repo: deb https://apt.kubernetes.io/ kubernetes-xenial main 
-      state: present
-      filename: kubernetes
-      mode: 0600
+    - name: Add Kubernetes' APT repository
+      apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v1.26/deb/ /"
+        state: present
+        update_cache: yes
     tags: [k8s_repo]
-
-  - name: Update apt repo and cache on all Debian/Ubuntu boxes
-    apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
-    tags: [aptcache]
 
   - name: Installing Kubernetes Cluster Packages.
     apt: 
