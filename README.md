@@ -12,7 +12,7 @@ First ssh via public IPs, set passwords, set hostnames (sudo hostnamectl set-hos
 Note, if Ubuntu was installed from scratch, ensure SSH is enabled and not firewalled. 
 
 Install ansible : https://docs.ansible.com/ansible/latest/installation_guide/installation_distros.html#installing-ansible-on-ubuntu 
-Install git : https://github.com/git-guides/install-git
+Install git if needed, should already be installed : https://github.com/git-guides/install-git
 
 ## Roles
 - k8s-prereqs
