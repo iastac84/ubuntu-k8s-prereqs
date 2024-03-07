@@ -6,8 +6,13 @@ Quickly setup Ubuntu servers for Kubernetes
 
 Playbook based on steps from A Cloud Guru : https://acloudguru-content-attachment-production.s3-accelerate.amazonaws.com/1658326656460-Building%20a%20Kubernetes%20Cluster.pdf with one control plane node and two workers. 
 
+## Prereqs
+
 First ssh via public IPs, set passwords, set hostnames (sudo hostnamectl set-hostname <hostname>), copy ssh keys. 
 Note, if Ubuntu was installed from scratch, ensure SSH is enabled and not firewalled. 
+
+Install ansible : https://docs.ansible.com/ansible/latest/installation_guide/installation_distros.html#installing-ansible-on-ubuntu 
+Install git : https://github.com/git-guides/install-git
 
 ## Roles
 - k8s-prereqs
