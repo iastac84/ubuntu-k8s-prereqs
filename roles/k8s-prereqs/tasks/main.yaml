@@ -125,8 +125,26 @@
   - name: Installing Kubernetes Cluster Packages.
     apt: 
       name:
-        - kubeadm=1.30.3-00
-        - kubectl=1.30.3-00
-        - kubelet=1.30.3-00
+        - kubeadm=1.30.3-1.1
+        - kubectl=1.30.3-1.1
+        - kubelet=1.30.3-1.1
       state: present
     tags: [install_k8s_binaries]
+
+  - name: Hold Kubernetes Cluster Packages.
+    ansible.builtin.dpkg_selections:
+      name: kubeadm
+      selection: hold
+    tags: [apt-mark-hold-k8s_binaries]
+
+  - name: Hold Kubernetes Cluster Packages.
+    ansible.builtin.dpkg_selections:
+      name: kubectl
+      selection: hold
+    tags: [apt-mark-hold-k8s_binaries]
+
+  - name: Hold Kubernetes Cluster Packages.
+    ansible.builtin.dpkg_selections:
+      name: kubelet
+      selection: hold
+    tags: [apt-mark-hold-k8s_binaries]
