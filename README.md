@@ -83,7 +83,7 @@ Create the Kubernetes cluster with ```kubeadm init```
 Example: 
 On the control plane node: 
 ```
-sudo kubeadm init --pod-network-cidr 192.168.0.0/16 --kubernetes-version 1.26.0
+sudo kubeadm init --pod-network-cidr 192.168.0.0/16 --kubernetes-version 1.30.3
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
