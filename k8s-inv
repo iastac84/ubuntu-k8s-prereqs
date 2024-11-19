@@ -1,5 +1,6 @@
 [master]
-isacg-kube01 ansible_user=cloud_user ansible_host=35.177.157.110
+server ansible_user=ubuntu ansible_host=10.44.22.174
 [workers]
-isacg-kube02 ansible_user=cloud_user ansible_host=13.40.17.181
-isacg-kube03 ansible_user=cloud_user ansible_host=3.8.154.90
+node-0 ansible_user=ubuntu ansible_host=10.44.22.206
+node-1 ansible_user=ubuntu ansible_host=10.44.22.172
+

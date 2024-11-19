@@ -109,7 +109,7 @@
 
   - name: Add Kubernetes apt-key
     get_url:
-      url: https://pkgs.k8s.io/core:/stable:/v1.26/deb/Release.key
+      url: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
       dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
       mode: '0644'
       force: true
@@ -117,7 +117,7 @@
 
   - name: Add Kubernetes' APT repository
     apt_repository:
-      repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v1.26/deb/ /"
+      repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /"
       state: present
       update_cache: yes
     tags: [k8s_repo]
