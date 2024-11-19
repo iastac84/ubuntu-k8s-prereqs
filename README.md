@@ -15,7 +15,7 @@ Install ansible : https://docs.ansible.com/ansible/latest/installation_guide/ins
 
 Install git if needed, should already be installed : https://github.com/git-guides/install-git
 
-Clone this repo
+Clone this repo.
 
 ## Roles
 - k8s-prereqs
