@@ -9,7 +9,7 @@ ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
 127.0.0.1 my-hostname
 
-10.44.22.206  node-0
-10.44.22.172  node-1
-10.44.22.174  server
+10.44.22.202   node-0
+10.44.22.145   node-1
+10.44.22.100   server
 
