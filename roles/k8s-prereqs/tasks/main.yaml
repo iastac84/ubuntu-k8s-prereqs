@@ -117,7 +117,7 @@
 
   - name: Add Kubernetes' APT repository
     apt_repository:
-      repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /"
+      repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /"
       state: present
       update_cache: yes
     tags: [k8s_repo]
@@ -125,8 +125,8 @@
   - name: Installing Kubernetes Cluster Packages.
     apt: 
       name:
-        - kubeadm
-        - kubectl
-        - kubelet
+        - kubeadm=1.30.3-00
+        - kubectl=1.30.3-00
+        - kubelet=1.30.3-00
       state: present
     tags: [install_k8s_binaries]

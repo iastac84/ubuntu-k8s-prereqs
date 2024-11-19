@@ -1,6 +1,6 @@
 [master]
-server ansible_user=ubuntu ansible_host=10.44.22.174
+server ansible_user=ubuntu ansible_host=10.44.22.100
 [workers]
-node-0 ansible_user=ubuntu ansible_host=10.44.22.206
-node-1 ansible_user=ubuntu ansible_host=10.44.22.172
+node-0 ansible_user=ubuntu ansible_host=10.44.22.202
+node-1 ansible_user=ubuntu ansible_host=10.44.22.145
 
